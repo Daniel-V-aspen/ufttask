@@ -1,0 +1,146 @@
+<mxfile host="Electron" modified="2024-04-16T17:58:12.636Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.1.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="6ouOWkvRNaPDsjGNm01d" version="24.1.0" type="device" pages="2">
+  <diagram name="Description" id="kpyFpb0iJtDKzTZqSPPz">
+    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="MZutyhSX819T72aEWWCa-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Description&lt;/h1&gt;&lt;div&gt;UFT task for MVT&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;We want a task that could be used by everone no just for someone with experiense in UFT . To achive that there are few things that we need to check and modify&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="740" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="MZutyhSX819T72aEWWCa-2" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Clone repo&lt;/h1&gt;&lt;div&gt;First we need to be able to clone the repo&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="740" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="MZutyhSX819T72aEWWCa-3" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Validate that the VM has all the prerequisites to run UFT&lt;/h1&gt;&lt;div&gt;Those requisites are:&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;1 UFT dlls&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;If thea VM doesn&#39;t have any of this elements we need to send the report with the error or the poinst that are missing&lt;/div&gt;&lt;div&gt;We can install Node JS using Choco&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="300" width="780" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="MZutyhSX819T72aEWWCa-4" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Compleate the .CSPROJ&lt;/h1&gt;&lt;div&gt;Some of the dlls are located in the vm, in the path where UFT was installed, when we build the project using command line if the CSPROJ doesn&#39;t have the reference or the hint it won&#39;t build the solution. Not all the user has experience with CSPROJ so we can&#39;t ask them to fix this.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Add a function to fix the .CSPROJ in the excecution or to validate that the information is there.&amp;nbsp;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="45" y="630" width="730" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="MZutyhSX819T72aEWWCa-5" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Try different ways to build the project&lt;/h1&gt;&lt;div&gt;There are different ways to build the solution&lt;/div&gt;&lt;div&gt;1. dotnet&lt;/div&gt;&lt;div&gt;2. nuget&lt;/div&gt;&lt;div&gt;3. msbuild tool kit&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;One option is check if the VM contains this tools or install it using Choco, I think that the best solution is install dotnet using choco&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="45" y="810" width="760" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="MZutyhSX819T72aEWWCa-6" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Build the project&lt;/h1&gt;&lt;div&gt;Build the solution and get the dll&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Here the challenge is check if we were able to build the solution, if not send an email with the report&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="45" y="970" width="770" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="MZutyhSX819T72aEWWCa-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Run the test case and generate the csv file&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1110" width="770" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="i_y81XxwsOdgUJL_hG4l-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Install Missing pre requisites&lt;/h1&gt;&lt;div&gt;1. Unit Test Framework - I think that we can do this using nuget&lt;/div&gt;&lt;div&gt;2. Node JS - We can install it with Node JS&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="760" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="lbOOUkVt4JYEEISVCX1n" name="Página-2">
+    <mxGraphModel dx="594" dy="1684" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="5EkmZwmxeAxAU_YmFZFC-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="5EkmZwmxeAxAU_YmFZFC-1" target="5EkmZwmxeAxAU_YmFZFC-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5EkmZwmxeAxAU_YmFZFC-1" value="Start" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="385" y="30" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="NOBS6tFadOEE8-lEBTn5-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="5EkmZwmxeAxAU_YmFZFC-2" target="NOBS6tFadOEE8-lEBTn5-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5EkmZwmxeAxAU_YmFZFC-2" value="Clone Repo" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="NOBS6tFadOEE8-lEBTn5-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="NOBS6tFadOEE8-lEBTn5-1" target="NOBS6tFadOEE8-lEBTn5-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="NOBS6tFadOEE8-lEBTn5-1" value="Validate Requisites" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="290" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="NOBS6tFadOEE8-lEBTn5-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="NOBS6tFadOEE8-lEBTn5-3" target="NOBS6tFadOEE8-lEBTn5-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="NOBS6tFadOEE8-lEBTn5-6" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="NOBS6tFadOEE8-lEBTn5-5">
+          <mxGeometry x="0.12" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NOBS6tFadOEE8-lEBTn5-9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="NOBS6tFadOEE8-lEBTn5-3" target="NOBS6tFadOEE8-lEBTn5-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="NOBS6tFadOEE8-lEBTn5-3" value="All requistites?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="385" y="400" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="NOBS6tFadOEE8-lEBTn5-4">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="750" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NOBS6tFadOEE8-lEBTn5-4" value="Send Email with the problems" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="590" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="NOBS6tFadOEE8-lEBTn5-8" target="w1hZCFJD3-Y1V1owP_M0-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="NOBS6tFadOEE8-lEBTn5-8" value="Compleate .csproj" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="530" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="w1hZCFJD3-Y1V1owP_M0-1" target="w1hZCFJD3-Y1V1owP_M0-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-1" value="Build Solution" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="640" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="w1hZCFJD3-Y1V1owP_M0-3" target="w1hZCFJD3-Y1V1owP_M0-5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="790" />
+              <mxPoint x="520" y="790" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-8" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="w1hZCFJD3-Y1V1owP_M0-7">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="w1hZCFJD3-Y1V1owP_M0-3" target="w1hZCFJD3-Y1V1owP_M0-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-3" value="Problems?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="385" y="750" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="w1hZCFJD3-Y1V1owP_M0-5" target="w1hZCFJD3-Y1V1owP_M0-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-5" value="Send email with the problems" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="590" y="760" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="w1hZCFJD3-Y1V1owP_M0-9" target="w1hZCFJD3-Y1V1owP_M0-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-9" value="Run Test Cases" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="890" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="w1hZCFJD3-Y1V1owP_M0-11" target="w1hZCFJD3-Y1V1owP_M0-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-11" value="Generate MVT report" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="1010" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="w1hZCFJD3-Y1V1owP_M0-13" target="w1hZCFJD3-Y1V1owP_M0-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-13" value="Send Report" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="1150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-15" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" vertex="1" parent="1">
+          <mxGeometry x="410" y="1270" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-16" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" vertex="1" parent="1">
+          <mxGeometry x="770" y="775" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="w1hZCFJD3-Y1V1owP_M0-17" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" vertex="1" parent="1">
+          <mxGeometry x="760" y="425" width="30" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

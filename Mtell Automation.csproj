@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{57969878-59D8-48C3-812F-5BDDEC891CE6}</ProjectGuid>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Mtell_Automation</RootNamespace>
+    <AssemblyName>Mtell Automation</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" >
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\PublicAssemblies\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HP.LFT.SDK, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.SDK.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HP.LFT.UnitTesting, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.UnitTesting.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HP.LFT.Common, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.Common.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HP.LFT.Communication.SocketClient, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>C:\Program Files (x86)\Micro Focus\UFT Developer\bin\HP.LFT.Communication.SocketClient.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HP.LFT.Report, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.Report.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HP.LFT.Verifications, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.Verifications.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WebSocket4Net, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>C:\Program Files (x86)\Micro Focus\UFT Developer\bin\WebSocket4Net.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Functions\CloseAspenONE.cs" />
+    <Compile Include="Functions\OpeningSM.cs" />
+    <Compile Include="mtellApplicationModel.tsrx.cs">
+      <DependentUpon>mtellApplicationModel.tsrx</DependentUpon>
+    </Compile>
+    <Compile Include="MtellAutomation.cs" />
+    <Compile Include="SLMmanagerAppModel.tsrx.cs">
+      <DependentUpon>SLMmanagerAppModel.tsrx</DependentUpon>
+    </Compile>
+    <Compile Include="Tests\ConnectSLMserver.cs" />
+    <Compile Include="Tests\SystemManager\AgentServices.cs" />
+    <Compile Include="Tests\SystemManager\ChangeServerSM.cs" />
+    <Compile Include="Tests\SystemManager\CreateDataSource.cs" />
+    <Compile Include="Tests\SystemManager\ConfigureEAM.cs" />
+    <Compile Include="Tests\SystemManager\ConnectDB.cs" />
+    <Compile Include="Tests\SystemManager\ConnectMaestro.cs" />
+    <Compile Include="Tests\SystemManager\ConnectMLservices.cs" />
+    <Compile Include="Tests\SystemManager\EmailServer.cs" />
+    <Compile Include="Tests\SystemManager\TrainingServices.cs" />
+    <Compile Include="UnitTestClassBase.cs" />
+    <None Include="App.config" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="mtellApplicationModel.tsrx">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="SLMmanagerAppModel.tsrx">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
