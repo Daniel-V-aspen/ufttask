@@ -142,38 +142,26 @@ $logger.logsPath = $pathLogs
 $logger.write = $true
 $logger.start()
 
+#inputs MVT
+#$P4_Project_Path = (Load-Setting -sARTServerUri $sARTUri -vision $vision  -project $blueprint -task $task1 -key P4_Project_Support) #Testcase you want to sync up. Support P4 and GIT https://aspentech-alm.visualstudio.com/AspenTech/_git/k6
+#$projectPath = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "Project path" # Relative folder of the project 
+#$projectName = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "Neme of the project" # Name of the project in UFT
 
-$pathUTest = "C:\Users\administrator\Desktop\Git\MtellCore-UFT\VS.QualityTools.UnitTestFramework.15.0.27323.2\lib\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll"
-#folders
-$dirUft = ('C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet',
-    'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\')
+#inputs Debug
+$projectPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT'
+$projectName = 'Mtell Automation'
 
-#Define a function to create the Result Object as a Matrix
-$reportTable = @()
-function ReportObject($id, $description, $result)
-{
-    $obj = New-Object PSObject
-    $obj|Add-Member -MemberType NoteProperty -Name "Id" -Value $id
-    $obj|Add-Member -MemberType NoteProperty -Name "Description" -Value $description
-    $obj|Add-Member -MemberType NoteProperty -Name "Result" -Value $result
-    return $obj
-}
+#Move to project path
+cd $projectPath
 
-for($i=0; $i -lt $dirUft.Count; $i++)
-{
-    if(-not(Test-Path -Path $dir2Test[$i]))
-    {
-        $des = "Dlls UFT pre requisites not found: <$($dir2Test[$i])>"
-        $logger.error($des)
-        $id = "Rerequisite$($i)"
-        $reportTable += @(ReportObject -id $id -description $des -result "Fail")
-    }
-}
-if(-not(Test-Path -Path $pathUTest))
-{
-    $des = "Dlls UFT pre requisites not found: <$($dir2Test[$i])>"
-    $logger.error($des)
-    $id = "Rerequisite$($i)"
-    $reportTable += @(ReportObject -id $id -description $des -result "Fail")
-}
-  
+$pathLeanft = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\leanft.bat'
+
+$logger.info("Start Leanft Services")
+for($i = 0 
+
+& $pathLeanft start  > .\.uftServiceStart.txt
+Start-Sleep -Seconds 2
+& $pathLeanft info  > .\.uftServiceStatus.txt
+
+
+
