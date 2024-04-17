@@ -171,7 +171,7 @@ for($i=0; $i -lt $dirUft.Count; $i++)
 }
 if(-not(Test-Path -Path $pathUTest))
 {
-    $des = "Dlls UFT pre requisites not found: <$($dir2Test[$i])>"
+    $des = "Dlls Unit Test Framework pre requisites not found: <$($dir2Test[$i])>"
     $logger.error($des)
     $id = "Rerequisite$($i)"
     $reportTable += @(ReportObject -id $id -description $des -result "Fail")

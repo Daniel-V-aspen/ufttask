@@ -155,13 +155,49 @@ $projectName = 'Mtell Automation'
 cd $projectPath
 
 $pathLeanft = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\leanft.bat'
+$pathLeanStart = '.\.uftServiceStart.txt'
+$pathLeanStatus = '.\.uftServiceStatus.txt'
+$leanRunning = $false
 
 $logger.info("Start Leanft Services")
-for($i = 0 
+for($i = 0; $i -lt 4; $i++)
+{
+    & $pathLeanft start  > $pathLeanStart
+    Start-Sleep -Seconds 2
+    $startInfo = Get-Content $pathLeanStart
+    if($startInfo -match 'already up')
+    {
+        $logger.info("Leanft Service is running")
+        $leanRunning = $true
+        break
+    }
+    Start-Sleep -Seconds 2
+    & $pathLeanft info  > $pathLeanStatus
+    $startInfo = Get-Content $pathLeanStart
+    if($statusInfo -match 'currently running')
+    {
+        $logger.info("Leanft Service is running")
+        $leanRunning = $true
+        break
+    }
+    $logger.info("Try to run Leanft Service: $($i+1)")
+}
 
-& $pathLeanft start  > .\.uftServiceStart.txt
-Start-Sleep -Seconds 2
-& $pathLeanft info  > .\.uftServiceStatus.txt
+
+$reportTable = @()
+function ReportObject($id, $description, $result)
+{
+    $obj = New-Object PSObject
+    $obj|Add-Member -MemberType NoteProperty -Name "Id" -Value $id
+    $obj|Add-Member -MemberType NoteProperty -Name "Description" -Value $description
+    $obj|Add-Member -MemberType NoteProperty -Name "Result" -Value $result
+    return $obj
+}
+
+if(-not($leanRunning))
+{
+    $reportTable += @(ReportObject -id "Leanft Service" -description "Unable to run the service" -result "Fail")
+}
 
 
 
