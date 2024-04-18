@@ -142,11 +142,6 @@ $logger.logsPath = $pathLogs
 $logger.write = $true
 $logger.start()
 
-#inputs MVT
-#$P4_Project_Path = (Load-Setting -sARTServerUri $sARTUri -vision $vision  -project $blueprint -task $task1 -key P4_Project_Support) #Testcase you want to sync up. Support P4 and GIT https://aspentech-alm.visualstudio.com/AspenTech/_git/k6
-#$projectPath = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "Project path" # Relative folder of the project 
-#$projectName = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "Neme of the project" # Name of the project in UFT
-
 #inputs Debug
 $projectPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT'
 $projectName = 'Mtell Automation'
@@ -154,33 +149,38 @@ $projectName = 'Mtell Automation'
 #Move to project path
 cd $projectPath
 
-#Install Prerequisites
-try
-{
-    choco --version
-}
-catch
-{
-    $logger.info("Installing Chocolatey")
-    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-}
-$logger.info("Installing Nuget")
-choco install nuget.commandline -f -y
+$buildFile = '.\.buildInformation.txt'
 
-$logger.info('Installing Node')
-&choco install nodejs --version=16.19.0 -f -y
 
-$logger.info("Installing Unit Test Package")
-NuGet Install VS.QualityTools.UnitTestFramework
-$pathLstUtest = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *QualityTools.UnitTestFramework.dll | Where-Object Mode -Match 'a' | Sort-Object -Property LastWriteTime -Descending
-$pathUTest = $pathLstUtest[0].FullName
+#Build Solution
+$logger.info("Build information in: <$($projectPath)\$buildFile>")
+dotnet build > $buildFile 
 
-try
+#Looking for the dll
+$logger.info("Looking for the dll")
+$buildInfo = Get-Content $buildFile
+$dllPath = $false
+for($i = 0; $i -lt $buildInfo.Count; $i++)
 {
-    dotnet --version
+    if($buildInfo[$i] -match $projectName)
+    {
+        $logger.info("Dll found")
+        Write-Host $buildInfo[$i]
+        $elements = $buildInfo[3].Split('>')
+        $dllPath = $elements[$elements.Count - 1].Substring(1)
+        break
+    }
 }
-catch
+if (-not($dllPath))
 {
-    $logger.error("Installing dotnet")
-    choco install dotnet --pre 
+    $logger.error("Dll not found")
 }
+$logger.info("dll in path <$($dllPath)>")
+if (-not(Test-Path -Path $dllPath))
+{
+    $logger.error("Dll path not found, path: <$($dllPath)>")
+}
+
+# Execute the automation, Before this I need to be sure that the service is running
+$logger.info('Excecuting UFT')
+vstest.console.exe $dllPath /Tests:_1a_SLMlicense,_2b_617914

@@ -161,7 +161,7 @@ function ReportObject($id, $description, $result)
     return $obj
 }
 
-$pathUTest = "C:\Users\administrator\Desktop\Git\MtellCore-UFT\VS.QualityTools.UnitTestFramework.15.0.27323.2\lib\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll"
+$pathUTest = "C:\Users\administrator\Desktop\Git\MtellCore-UFT\VS.QualityTools.UnitTestFramework.15.0.27323.2\lib\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll"
 
 $references = @{
     'Microsoft.VisualStudio.QualityTools.UnitTestFramework' = $pathUTest;
@@ -188,6 +188,7 @@ $logger.debug("CSPROJ found, path: <$($pathCsproj)>")
 $logger.info("Starting process to replace the references")
 $findRequirements = $false
 $refFound = 0
+$childHint = $csprojInfo.CreateElement('HintPath')
 for($i = 0; $i -lt $csprojInfo.Project.ItemGroup.Count; $i++)
 {
     if($csprojInfo.Project.ItemGroup[$i].Reference.Count -gt 0)
@@ -200,15 +201,25 @@ for($i = 0; $i -lt $csprojInfo.Project.ItemGroup.Count; $i++)
                 $refKey = $csprojInfo.Project.ItemGroup[$i].Reference[$ref].Include.split(',')[0]
                 $logger.debug("Reference: $($refKey) found")
                 $refFound++
-                $logger.debug("Adding hitpath: $($references[$refKey])")
-                $csprojInfo.Project.ItemGroup[$i].Reference[$ref].HintPath = $references[$refKey]
-                $csprojInfo.Project.ItemGroup[$i].Reference[$ref].SpecificVersion = $false
+                $logger.debug("Adding HintPath: $($references[$refKey])")
+                $childHint = $csprojInfo.CreateElement('HintPath') 
+                if(-not($csprojInfo.Project.ItemGroup[$i].Reference[$ref].HintPath))
+                {
+                    [void]$csprojInfo.Project.ItemGroup[$i].Reference[$ref].AppendChild($childHint)
+                }
+                $csprojInfo.Project.ItemGroup[$i].Reference[$ref].HintPath = $references[$refKey].ToString()
             }
         }
     }
 }
 $logger.info("Saving changes in the .csparoj <$($pathCsproj)>")
 $csprojInfo.Save($pathCsproj)
+
+#Delete xmlns = '' in the csproj
+$logger.info('Delete xmlns="" from the csproj created by ps')
+$csprojInfoTxt = Get-Content $pathCsproj
+$csprojInfoTxt = $csprojInfoTxt.replace(' xmlns=""','')
+Set-Content -Path $pathCsproj -Value $csprojInfoTxt
 
 if(-not($findRequirements))
 {
@@ -219,3 +230,5 @@ if($refFound -ne $references.Count)
 {
     $reportTable += @(ReportObject -id "Number of references found" -description "Unable to find all the references, References found: <$($refFound), expected references $($references.Count)>" -result "Fail")
 }
+
+dotnet build
