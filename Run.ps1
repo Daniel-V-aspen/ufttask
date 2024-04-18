@@ -183,4 +183,4 @@ if (-not(Test-Path -Path $dllPath))
 
 # Execute the automation, Before this I need to be sure that the service is running
 $logger.info('Excecuting UFT')
-vstest.console.exe $dllPath /Tests:_1a_SLMlicense,_2b_617914
+vstest.console.exe $dllPath # /Tests:_1a_SLMlicense,_2b_617914
