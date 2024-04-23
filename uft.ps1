@@ -1,4 +1,4 @@
-﻿$pathLogs = ".\MvtUftLogs.txt"
+﻿$pathLogs = "C:\p4\MvtUftLogs.txt"
 class Logs 
 {
     [string]$logsPath = ""
@@ -142,40 +142,94 @@ $logger.logsPath = $pathLogs
 $logger.write = $true
 $logger.start()
 
-$sARTUri = 'http://mvf1:3000'
-$taskName = "uft_runner"
-$DebugPreference = "Continue"
+#Folders that need to be in the VM
+$dirUft = ('C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet',
+    'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\')
 
-
-#$sARTUri = 'http://hqqaeblade710.qae.aspentech.com:3000'
-# $vision = "Mtell Deployment No31 in US East"
-# $blueprint = "Mtell Deployment No31 in US East_Deployment_Automated"
-# $task1 = "Web_Certificate"
-
-
-while ($true) {
-    try {
-        iex ((New-Object System.Net.WebClient).DownloadString("$sARTUri/api/ps/MediaInstallation@MediaInstallationLibrary.ps1"))
-        iex ((New-Object System.Net.WebClient).DownloadString("$sARTUri/api/ps/Library.ps1"))
-        iex ((New-Object System.Net.WebClient).DownloadString("$sARTUri/api/ps/CommonHeader.ps1"))
-        Write-Host "`nART Libraries were imported"
-        break
-    }
-    catch {
-        Write-Host "`nCould NOT import the ART Libraries"
-    }
+#Information needed for the report
+$reportTable = @()
+function ReportObject($id, $description, $result)
+{
+    $obj = New-Object PSObject
+    $obj|Add-Member -MemberType NoteProperty -Name "Id" -Value $id
+    $obj|Add-Member -MemberType NoteProperty -Name "Description" -Value $description
+    $obj|Add-Member -MemberType NoteProperty -Name "Result" -Value $result
+    return $obj
 }
 
-#I should find a different way to build the solution. Nuget and MSBuild tool kit must work. 
+#inputs Debug ------------------------------------------------------------------------------------ Change this
+$projectPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT'
+$projectName = 'Mtell Automation'
+$testplanPath = 'testplan.txt'
 
-#inputs MVT
-$P4_Project_Path = (Load-Setting -sARTServerUri $sARTUri -vision $vision  -project $blueprint -task $task1 -key P4_Project_Support) #Testcase you want to sync up. Support P4 and GIT https://aspentech-alm.visualstudio.com/AspenTech/_git/k6
-$projectPath = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "Project path" # Relative folder of the project 
-$projectName = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "Neme of the project" # Name of the project in UFT
+#Mmoving into project path ------------------------------------------------------------------------------------ Change this
 
-#inputs Debug
-#$projectPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT'
-#$projectName = 'Mtell Automation'
+
+$logger.debug("Changing directory to path <$($projectPath)>")
+
+#debug ------------------------------------------------------------------------------------ Change this
+cd $projectPath
+
+#Install prerequisites
+$logger.info("Installing prerequisites")
+$logger.info("Installing Choco")
+try
+{
+    choco --version
+}
+catch
+{
+    $logger.info("Installing Chocolatey")
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+}
+$logger.info("Installing Nuget")
+choco install nuget.commandline -f -y
+
+$logger.info('Installing Node')
+&choco install nodejs --version=16.19.0 -f -y
+
+$logger.info("Installing Unit Test Package")
+NuGet Install VS.QualityTools.UnitTestFramework
+$pathLstUtest = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *QualityTools.UnitTestFramework.dll | Where-Object Mode -Match 'a' | Sort-Object -Property LastWriteTime -Descending
+$pathUTest = $pathLstUtest[0].FullName
+
+try
+{
+    dotnet --version
+}
+catch
+{
+    $logger.info("Installing dotnet")
+    choco install dotnet --pre 
+}
+
+#Validate Prerequisites
+for($i=0; $i -lt $dirUft.Count; $i++)
+{
+    if(-not(Test-Path -Path $dir2Test[$i]))
+    {
+        $des = "Dlls UFT pre requisites not found: <$($dir2Test[$i])>"
+        $logger.error($des)
+        $id = "Rerequisite$($i)"
+        $reportTable += @(ReportObject -id $id -description $des -result "Fail")
+    }
+}
+if(-not(Test-Path -Path $pathUTest))
+{
+    $des = "Dlls Unit Test Framework pre requisites not found: <$($dir2Test[$i])>"
+    $logger.error($des)
+    $id = "Rerequisite$($i)"
+    $reportTable += @(ReportObject -id $id -description $des -result "Fail")
+}
+
+
+
+
+
+
+
+
+
 
 #folders
 $dirUtFramework = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\PublicAssemblies'

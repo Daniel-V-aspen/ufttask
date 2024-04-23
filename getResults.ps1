@@ -148,7 +148,6 @@ $logger.start()
 $projectPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT'
 $projectName = 'Mtell Automation'
 $testplanPath = 'testplan.txt'
-#$testplanPath = 'TestResults'
 
 
 $dllPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT\Mtell Automation\bin\Debug\Mtell Automation.dll'
