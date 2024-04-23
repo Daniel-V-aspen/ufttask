@@ -1,4 +1,5 @@
-﻿$pathLogs = ".\MvtUftLogs.txt"
+﻿#getresults
+$pathLogs = ".\MvtUftLogs.txt"
 class Logs 
 {
     [string]$logsPath = ""
@@ -142,6 +143,7 @@ $logger.logsPath = $pathLogs
 $logger.write = $true
 $logger.start()
 
+
 #inputs Debug
 $projectPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT'
 $projectName = 'Mtell Automation'
@@ -153,8 +155,6 @@ $dllPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT\Mtell Automation\bi
 
 #Move to project path
 cd $projectPath
-
-$buildFile = '.\.buildInformation.txt'
 
 #Get list of test cases
 $testplanFullPath = Join-Path -Path $projectPath -ChildPath $testplanPath
@@ -168,41 +168,45 @@ foreach($testcase in $testPlanInfo)
     $tpInfo[$testcase.name] = $testcase.id
     $tc2Run += $testcase.name + ','
 }
+#Get results
+$logger.info("Looking for the results file")
+$reportFilePath = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *.trx | Sort-Object -Property LastWriteTime -Descending
+$logger.info("Report file found in the path: <$($reportFilePath[0].FullName)>")
 
 
+#Extracting the content from the last File storaged inside a variable named $text
+$logger.info("Creating MVT report")
+[xml]$xmlReport = Get-Content -Path $reportFilePath[0].FullName
+$xmlData = $xmlReport.TestRun.Results
 
-#Build Solution
-$logger.info("Build information in: <$($projectPath)\$buildFile>")
-dotnet build > $buildFile 
 
-#Looking for the dll
-$logger.info("Looking for the dll")
-$buildInfo = Get-Content $buildFile
-$dllPath = $false
-for($i = 0; $i -lt $buildInfo.Count; $i++)
+#Define a function to create the Result Object as a Matrix
+function ReportObject($id, $description, $result)
 {
-    if($buildInfo[$i] -match $projectName)
-    {
-        $logger.info("Dll found")
-        Write-Host $buildInfo[$i]
-        $elements = $buildInfo[3].Split('>')
-        $dllPath = $elements[$elements.Count - 1].Substring(1)
-        break
+    $obj = New-Object PSObject
+    $obj|Add-Member -MemberType NoteProperty -Name "Id" -Value $id
+    $obj|Add-Member -MemberType NoteProperty -Name "Description" -Value $description
+    $obj|Add-Member -MemberType NoteProperty -Name "Result" -Value $result
+    return $obj
+}
+
+#Creating MVT Report
+$reportTable = @()        
+foreach($result in $xmlData){
+    $id = $tpInfo[$result.UnitTestResult.testName]
+    $description = 'Test Name: ' + $result.UnitTestResult.testName + 'Duration ' + [string]$result.UnitTestResult.duration
+    if ($result.UnitTestResult.outcome.Contains("Passed")) {
+        $result = "Pass"
     }
-}
-if (-not($dllPath))
-{
-    $logger.error("Dll not found")
-}
-$logger.info("dll in path <$($dllPath)>")
-if (-not(Test-Path -Path $dllPath))
-{
-    $logger.error("Dll path not found, path: <$($dllPath)>")
+    else {
+        $result = "Fail"
+    }
+
+    $reportTable += @(ReportObject -id $id -description $description -result $result)
 }
 
-# Execute the automation, Before this I need to be sure that the service is running
-$logger.info('Excecuting UFT')
-vstest.console.exe $dllPath # /Tests:_1a_SLMlicense,_2b_617914
+$logger.info("Mvt Report in path: <$($mvtReport)>")
+$reportTable | Export-Csv -Path $mvtReport -NoTypeInformation -Encoding UTF8 -Force
 
-vstest.console.exe $dllPath /Tests:$tc2Run /Logger:trx
-
+#project finish!
+#Set-NextProject -sARTServerUri $sARTUri -vision $vision -project $projectId -completion $lsCompletion
