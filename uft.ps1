@@ -146,6 +146,11 @@ $logger.start()
 $dirUft = ('C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet',
     'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\')
 
+#UFT Service variables
+$pathLeanft = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\leanft.bat'
+$pathLeanStart = '.\.uftServiceStart.txt'
+$pathLeanStatus = '.\.uftServiceStatus.txt'
+
 #Information needed for the report
 $reportTable = @()
 function ReportObject($id, $description, $result)
@@ -222,23 +227,55 @@ if(-not(Test-Path -Path $pathUTest))
     $reportTable += @(ReportObject -id $id -description $des -result "Fail")
 }
 
+#Start Services
+$logger.info("Start Leanft Services")
+$leanRunning = $false
+for($i = 0; $i -lt 4; $i++)
+{
+    & $pathLeanft start  > $pathLeanStart
+    Start-Sleep -Seconds 2
+    $startInfo = Get-Content $pathLeanStart
+    if($startInfo -match 'already up')
+    {
+        $logger.info("Leanft Service is running")
+        $leanRunning = $true
+        break
+    }
+    Start-Sleep -Seconds 2
+    & $pathLeanft info  > $pathLeanStatus
+    $startInfo = Get-Content $pathLeanStart
+    if($statusInfo -match 'currently running')
+    {
+        $logger.info("Leanft Service is running")
+        $leanRunning = $true
+        break
+    }
+    $logger.debug("Try to run Leanft Service: $($i+1)")
+}
+
+if(-not($leanRunning))
+{
+    $reportTable += @(ReportObject -id "Leanft Service" -description "Unable to run the service" -result "Fail")
+}
+
+
+#Variables Build Solution
+$references = @{
+    'Microsoft.VisualStudio.QualityTools.UnitTestFramework' = $pathUTest;
+    'HP.LFT.SDK' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.SDK.dll';
+    'HP.LFT.UnitTesting' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.UnitTesting.dll';
+    'HP.LFT.Common' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.Common.dll';
+    'HP.LFT.Communication.SocketClient' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\HP.LFT.Communication.SocketClient.dll';
+    'HP.LFT.Report' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.Report.dll';
+    'HP.LFT.Verifications' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.Verifications.dll'
+    'WebSocket4Net' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\WebSocket4Net.dll'
+    }
 
 
 
 
 
 
-
-
-
-#folders
-$dirUtFramework = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\PublicAssemblies'
-$dirUftDotnet = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet'
-$dirUftBin = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\'
-
-#build information
-$buildFile = '.\buildInformation.txt'
-$mvtReport = '.\mvtReport.csv'
 
 #Clone Repo
 $cmd = { Sync-FromP4 -P4_User wuwei -P4_Server hqperforce2.corp.aspentech.com:1666 -P4_Location_List @($P4_Path) -P4_PASSWORD $secureString_wwwPass -P4_Work_Space_Folder c:\p4 -P4_Work_Space_Name ART -gitAccessToken $secureString_www_git -gitHubAccessToken $secureString_www_github_password }
