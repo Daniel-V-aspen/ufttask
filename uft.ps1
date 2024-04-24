@@ -217,9 +217,9 @@ catch
 #Validate Prerequisites
 for($i=0; $i -lt $dirUft.Count; $i++)
 {
-    if(-not(Test-Path -Path $dir2Test[$i]))
+    if(-not(Test-Path -Path $dirUft[$i]))
     {
-        $des = "Dlls UFT pre requisites not found: <$($dir2Test[$i])>"
+        $des = "Dlls UFT pre requisites not found: <$($dirUft[$i])>"
         $logger.error($des)
         $id = "Rerequisite$($i)"
         $reportTable += @(ReportObject -id $id -description $des -result "Fail")
@@ -227,7 +227,7 @@ for($i=0; $i -lt $dirUft.Count; $i++)
 }
 if(-not(Test-Path -Path $pathUTest))
 {
-    $des = "Dlls Unit Test Framework pre requisites not found: <$($dir2Test[$i])>"
+    $des = "Dlls Unit Test Framework pre requisites not found: <$($dirUft[$i])>"
     $logger.error($des)
     $id = "Rerequisite$($i)"
     $reportTable += @(ReportObject -id $id -description $des -result "Fail")
@@ -322,31 +322,44 @@ Set-Content -Path $pathCsproj -Value $csprojInfoTxt
 
 if(-not($findRequirements))
 {
+    $logger.error("References not found")
     $reportTable += @(ReportObject -id "References" -description "Unable to find the references" -result "Fail")
 }
 
 if($refFound -ne $references.Count)
 {
+    $logger.error("Number of references doesn't match with the number of references expected")
     $reportTable += @(ReportObject -id "Number of references found" -description "Unable to find all the references, References found: <$($refFound), expected references $($references.Count)>" -result "Fail")
 }
 
-if($reportTable.Length > 0)
+#Get list of TCS to run
+$tc2Run = ''
+if($reportTable.Length -eq 0)
 {
-    #Get list of test cases
+    if($testplanPath -eq "" -or $testplanPath -eq $null)
+    {
+        $logger.error("Test plan file not found")
+        break
+    }
     $testplanFullPath = Join-Path -Path $projectPath -ChildPath $testplanPath
-    Test-Path -Path $testplanFullPath
-    $testPlanInfo = Import-Csv -Path $testplanFullPath
-
+    if(-not(Test-Path -Path $testplanFullPath))
+    {
+        $logger.error("Test plan file not found")
+        break
+    }
     $tpInfo = @{}
-    $tc2Run = ''
     foreach($testcase in $testPlanInfo)
     {
         $tpInfo[$testcase.name] = $testcase.id
         $tc2Run += $testcase.name + ','
     }
-    
-    #Build Solution
-    $logger.info("Build information in: <$($projectPath)\$buildFile>")
+    $logger.debug("List of test cases in the test plan <$($tc2Run)>")
+}
+
+#Build Solution
+if($reportTable.Length -eq 0)
+{
+    $logger.info("Build information in: <$($projectPath) + $buildFile>")
     dotnet build > $buildFile 
 
     #Looking for the dll
@@ -365,7 +378,7 @@ if($reportTable.Length > 0)
         }
     }
     if (-not($dllPath))
-    {
+    { 
         $logger.error("Dll not found")
     }
     $logger.info("dll in path <$($dllPath)>")
@@ -376,14 +389,21 @@ if($reportTable.Length > 0)
     }
 }
 
-if($reportTable.Length > 0)
+if($reportTable.Length -eq 0)
 {
     # Execute the automation
     $logger.info('Excecuting UFT')
-    vstest.console.exe $dllPath /Tests:$tc2Run /Logger:trx
+    if($tc2Run -eq '' -or $tc2Run -eq $null)
+    {
+        vstest.console.exe $dllPath /Logger:trx
+    }
+    else
+    {
+        vstest.console.exe $dllPath /Tests:$tc2Run /Logger:trx
+    }
 }
 
-if($reportTable.Length > 0)
+if($reportTable.Length -eq 0)
 {
     $mvtReport = Join-Path -Path $projectPath -ChildPath 'mvtReport.csv'
     #Get results
@@ -400,7 +420,14 @@ if($reportTable.Length > 0)
     #Creating MVT Report
     $reportTable = @()        
     foreach($result in $xmlData){
-        $id = $tpInfo[$result.UnitTestResult.testName]
+        if($tpInfo[$result.UnitTestResult.testName] -eq '' -or $tpInfo[$result.UnitTestResult.testName] -eq $null)
+        {
+            $id = $result.UnitTestResult.testName
+        }
+        else
+        {
+            $id = $tpInfo[$result.UnitTestResult.testName]
+        }
         $description = 'Test Name: ' + $result.UnitTestResult.testName + 'Duration ' + [string]$result.UnitTestResult.duration
         if ($result.UnitTestResult.outcome.Contains("Passed")) {
             $result = "Pass"
