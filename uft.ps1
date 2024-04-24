@@ -140,6 +140,7 @@ class Logs
 $logger = [Logs]::new()
 $logger.logsPath = $pathLogs
 $logger.write = $true
+$logger.cli_level = 'DEBUG'
 $logger.start()
 
 #Folders that need to be in the VM
@@ -150,6 +151,9 @@ $dirUft = ('C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet',
 $pathLeanft = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\leanft.bat'
 $pathLeanStart = '.\.uftServiceStart.txt'
 $pathLeanStatus = '.\.uftServiceStatus.txt'
+
+#Build Solution
+$buildFile = '.\.buildInformation.txt'
 
 #Information needed for the report
 $reportTable = @()
@@ -167,7 +171,8 @@ $projectPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT'
 $projectName = 'Mtell Automation'
 $testplanPath = 'testplan.txt'
 
-#Mmoving into project path ------------------------------------------------------------------------------------ Change this
+#Clone Repo
+#Moving into project path ------------------------------------------------------------------------------------ Change this
 
 
 $logger.debug("Changing directory to path <$($projectPath)>")
@@ -177,7 +182,7 @@ cd $projectPath
 
 #Install prerequisites
 $logger.info("Installing prerequisites")
-$logger.info("Installing Choco")
+$logger.debug("Choco")
 try
 {
     choco --version
@@ -193,11 +198,12 @@ choco install nuget.commandline -f -y
 $logger.info('Installing Node')
 &choco install nodejs --version=16.19.0 -f -y
 
-$logger.info("Installing Unit Test Package")
+$logger.debug("Installing Unit Test Package")
 NuGet Install VS.QualityTools.UnitTestFramework
 $pathLstUtest = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *QualityTools.UnitTestFramework.dll | Where-Object Mode -Match 'a' | Sort-Object -Property LastWriteTime -Descending
 $pathUTest = $pathLstUtest[0].FullName
 
+$logger.debug("dotnet")
 try
 {
     dotnet --version
@@ -271,146 +277,142 @@ $references = @{
     'WebSocket4Net' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\WebSocket4Net.dll'
     }
 
+$logger.info("Looking for the .csproj file")
+$pathLstCsproj = Get-ChildItem -Path .\ -Recurse -Filter *.csproj
+$pathCsproj = $pathLstCsproj[0].FullName
+$logger.debug("CSPROJ found, path: <$($pathCsproj)>")
 
+[xml]$csprojInfo = Get-Content $pathCsproj
 
-
-
-
-
-#Clone Repo
-$cmd = { Sync-FromP4 -P4_User wuwei -P4_Server hqperforce2.corp.aspentech.com:1666 -P4_Location_List @($P4_Path) -P4_PASSWORD $secureString_wwwPass -P4_Work_Space_Folder c:\p4 -P4_Work_Space_Name ART -gitAccessToken $secureString_www_git -gitHubAccessToken $secureString_www_github_password }
-Run-SecureCmd -sARTUri $sARTUri -cmd $cmd -arg @{P4_Path = $P4_Path; p4_ip = $p4_ip; P4_Work_Space_Folder = $P4_Work_Space_Folder }
-if ($P4_Path.GetType().Name -eq "String") {
-    #analytics directory
-    $sAnalytics_directory = Convert-P4LocationToWinLocation -P4Location $P4_Path -P4_Work_Space_Folder c:\p4
-    $sAnalytics_Invoker = Join-Path -Path $sAnalytics_directory -ChildPath $FileName
-    if ((Test-Path -Path $sAnalytics_Invoker) -ne $true) {
-        $sAnalytics_Invoker = Convert-P4LocationToWinLocation -P4Location $FileName -P4_Work_Space_Folder c:\p4
-    }
-}
-else {
-    $sAnalytics_Invoker = Convert-P4LocationToWinLocation -P4Location $FileName -P4_Work_Space_Folder c:\p4
-}
-$sAnalytics_Invoker = Join-Path -Path $sAnalytics_directory -ChildPath $FileName
-$activeFolder = Split-Path -Path $sAnalytics_Invoker -Parent
-Set-Location -Path $activeFolder
-$transcriptPath = Join-Path -Path $activeFolder -ChildPath "$task1.log"
-Start-Transcript -Path $transcriptPath -Force
-
-#Move to project path
-Join-Path -Path $activeFolder -ChildPath $projectPath
-$logger.info("Moving into path $($projectPath)")
-cd $projectPath
-
-#Validating Dlls
-$logger.info("Checking prerequisites")
-$logger.debug("Checking Unit Test Framework: <$($dirUtFramework)>")
-if(-not(Test-Path -Path $dirUtFramework))
+$logger.info("Starting process to replace the references")
+$findRequirements = $false
+$refFound = 0
+$childHint = $csprojInfo.CreateElement('HintPath')
+for($i = 0; $i -lt $csprojInfo.Project.ItemGroup.Count; $i++)
 {
-    $logger.error("Unit Test Framework path not found: <$($dirUtFramework)>")
-    Start-Sleep -Seconds 10
-}
-$logger.debug("Checking UFT dotnet dlls: <$($dirUftDotnet)>")
-if(-not(Test-Path -Path $dirUftDotnet))
-{
-    $logger.error("Dotnet dlls path not found: <$($dirUftDotnet)>")
-    Start-Sleep -Seconds 10
-}
-$logger.debug("Checking UFT bins dlls: <$($dirUftBin)>")
-if(-not(Test-Path -Path $dirUftBin))
-{
-    $logger.error("UFT bins dlls path not found: <$($dirUftBin)>")
-    Start-Sleep -Seconds 10
-}
-
-#Validate Dotnet, Here should be the option to use Nuget, or MSBuild tool kit, use chocolatey mvt task
-try
-{
-    dotnet --version
-}
-catch
-{
-    $logger.error("Dotnet not installed in this VM")
-}
-
-#Build Solution
-$logger.info("Build information in: <$($projectPath)\$buildFile>")
-dotnet build > $buildFile 
-
-#Looking for the dll
-$logger.info("Looking for the dll")
-$buildInfo = Get-Content $buildFile
-$dllPath = $false
-for($i = 0; $i -lt $buildInfo.Count; $i++)
-{
-    if($buildInfo[$i] -match $projectName)
+    if($csprojInfo.Project.ItemGroup[$i].Reference.Count -gt 0)
     {
-        $logger.info("Dll found")
-        Write-Host $buildInfo[$i]
-        $elements = $buildInfo[3].Split('>')
-        $dllPath = $elements[$elements.Count - 1].Substring(1)
-        break
+        $findRequirements = $true
+        for($ref = 0; $ref -lt $csprojInfo.Project.ItemGroup[$i].Reference.Count; $ref++)
+        {
+            if($references[$csprojInfo.Project.ItemGroup[$i].Reference[$ref].Include.split(',')[0]] -ne $null)
+            {
+                $refKey = $csprojInfo.Project.ItemGroup[$i].Reference[$ref].Include.split(',')[0]
+                $logger.debug("Reference: $($refKey) found")
+                $refFound++
+                $logger.debug("Adding HintPath: $($references[$refKey])")
+                $childHint = $csprojInfo.CreateElement('HintPath') 
+                if(-not($csprojInfo.Project.ItemGroup[$i].Reference[$ref].HintPath))
+                {
+                    [void]$csprojInfo.Project.ItemGroup[$i].Reference[$ref].AppendChild($childHint)
+                }
+                $csprojInfo.Project.ItemGroup[$i].Reference[$ref].HintPath = $references[$refKey].ToString()
+            }
+        }
     }
 }
-if (-not($dllPath))
+$logger.info("Saving changes in the .csparoj <$($pathCsproj)>")
+$csprojInfo.Save($pathCsproj)
+
+#Delete xmlns = '' in the csproj
+$logger.info('Delete xmlns="" from the csproj created by ps')
+$csprojInfoTxt = Get-Content $pathCsproj
+$csprojInfoTxt = $csprojInfoTxt.replace(' xmlns=""','')
+Set-Content -Path $pathCsproj -Value $csprojInfoTxt
+
+if(-not($findRequirements))
 {
-    $logger.error("Dll not found")
-}
-$logger.info("dll in path <$($dllPath)>")
-if (-not(Test-Path -Path $dllPath))
-{
-    $logger.error("Dll path not found, path: <$($dllPath)>")
-}
-
-# Execute the automation, Before this I need to be sure that the service is running
-$logger.info('Excecuting UFT')
-vstest.console.exe $dllPath
-
-
-#Get results
-$logger.info("Looking for the results file")
-$reportFilePath = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *.xml | Sort-Object -Property LastWriteTime -Descending
-$logger.info("Report file found in the path: <$($reportFilePath[0].FullName)>")
-
-
-#Extracting the content from the last File storaged inside a variable named $text
-$logger.info("Creating MVT report")
-[xml]$xmlReport = Get-Content -Path $reportFilePath[0].FullName
-$xmlData = $xmlReport.Results.ReportNode.ReportNode.ReportNode.ReportNode.ReportNode.Data
-
-
-#Define a function to create the Result Object as a Matrix
-function ReportObject($id, $description, $result)
-{
-    $obj = New-Object PSObject
-    $obj|Add-Member -MemberType NoteProperty -Name "Id" -Value $id
-    $obj|Add-Member -MemberType NoteProperty -Name "Description" -Value $description
-    $obj|Add-Member -MemberType NoteProperty -Name "Result" -Value $result
-    return $obj
+    $reportTable += @(ReportObject -id "References" -description "Unable to find the references" -result "Fail")
 }
 
-#Creating MVT Report
-$reportTable = @()        
-for($i = 0; $i -lt $xmlData.Length; $i++){
-    $id = $xmlData[$i].Name.InnerText.Replace("_", "")       # This line removes the underscore of the test's name
+if($refFound -ne $references.Count)
+{
+    $reportTable += @(ReportObject -id "Number of references found" -description "Unable to find all the references, References found: <$($refFound), expected references $($references.Count)>" -result "Fail")
+}
 
-    $description = $xmlData[0].ErrorText.InnerText
-    $logger.debug("TC Name: <$($xmlData[0].Name.InnerText)>; TC Description: <$($xmlData[0].ErrorText.InnerText)>; TC Result: <$($xmlData[$i].Result)>;")
+if($reportTable.Length > 0)
+{
+    #Get list of test cases
+    $testplanFullPath = Join-Path -Path $projectPath -ChildPath $testplanPath
+    Test-Path -Path $testplanFullPath
+    $testPlanInfo = Import-Csv -Path $testplanFullPath
 
-    #This clause is made to get a correct email report with MVT task
-    if ($xmlData[$i].Result.Contains("Passed")) {
-        $result = "Pass"
+    $tpInfo = @{}
+    $tc2Run = ''
+    foreach($testcase in $testPlanInfo)
+    {
+        $tpInfo[$testcase.name] = $testcase.id
+        $tc2Run += $testcase.name + ','
     }
-    else {
-        $result = "Fail"
-    }
+    
+    #Build Solution
+    $logger.info("Build information in: <$($projectPath)\$buildFile>")
+    dotnet build > $buildFile 
 
-    $reportTable += @(ReportObject -id $id -description $description -result $result)
+    #Looking for the dll
+    $logger.info("Looking for the dll")
+    $buildInfo = Get-Content $buildFile
+    $dllPath = $false
+    for($i = 0; $i -lt $buildInfo.Count; $i++)
+    {
+        if($buildInfo[$i] -match $projectName)
+        {
+            $logger.info("Dll found")
+            Write-Host $buildInfo[$i]
+            $elements = $buildInfo[3].Split('>')
+            $dllPath = $elements[$elements.Count - 1].Substring(1)
+            break
+        }
+    }
+    if (-not($dllPath))
+    {
+        $logger.error("Dll not found")
+    }
+    $logger.info("dll in path <$($dllPath)>")
+    if (-not(Test-Path -Path $dllPath))
+    {
+        $logger.error("Dll path not found, path: <$($dllPath)>")
+        $reportTable += @(ReportObject -id "Dll not found" -description "Unable to find dll path, build information in <$($projectPath)\$buildFile>" -result "Fail")
+    }
 }
 
+if($reportTable.Length > 0)
+{
+    # Execute the automation
+    $logger.info('Excecuting UFT')
+    vstest.console.exe $dllPath /Tests:$tc2Run /Logger:trx
+}
 
-$logger.info("Mvt Report in path: <$($mvtReport)>")
-$reportTable | Export-Csv -Path $mvtReport -NoTypeInformation -Encoding UTF8 -Force
+if($reportTable.Length > 0)
+{
+    $mvtReport = Join-Path -Path $projectPath -ChildPath 'mvtReport.csv'
+    #Get results
+    $logger.info("Looking for the results file")
+    $reportFilePath = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *.trx | Sort-Object -Property LastWriteTime -Descending
+    $logger.info("Report file found in the path: <$($reportFilePath[0].FullName)>")
 
-#project finish!
-#Set-NextProject -sARTServerUri $sARTUri -vision $vision -project $projectId -completion $lsCompletion
+
+    #Extracting the content from the last File storaged inside a variable named $text
+    $logger.info("Creating MVT report")
+    [xml]$xmlReport = Get-Content -Path $reportFilePath[0].FullName
+    $xmlData = $xmlReport.TestRun.Results
+
+    #Creating MVT Report
+    $reportTable = @()        
+    foreach($result in $xmlData){
+        $id = $tpInfo[$result.UnitTestResult.testName]
+        $description = 'Test Name: ' + $result.UnitTestResult.testName + 'Duration ' + [string]$result.UnitTestResult.duration
+        if ($result.UnitTestResult.outcome.Contains("Passed")) {
+            $result = "Pass"
+        }
+        else {
+            $result = "Fail"
+        }
+
+        $reportTable += @(ReportObject -id $id -description $description -result $result)
+    }
+
+    $logger.info("Mvt Report in path: <$($mvtReport)>")
+    $reportTable | Export-Csv -Path $mvtReport -NoTypeInformation -Encoding UTF8 -Force
+}
+
