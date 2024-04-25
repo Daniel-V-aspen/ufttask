@@ -204,15 +204,15 @@ $Email_Subject = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -pro
 #$projectName = 'Mtell Automation'
 #$testplanPath = 'testplan.txt' #Id, Function name
 
-
-
 #Clone Repo
-#Moving into project path ------------------------------------------------------------------------------------ Change this
-
+$cmd = { Sync-FromP4 -P4_User wuwei -P4_Server hqperforce2.corp.aspentech.com:1666 -P4_Location_List @($P4_Path) -P4_PASSWORD $secureString_wwwPass -P4_Work_Space_Folder c:\p4 -P4_Work_Space_Name ART -gitAccessToken $secureString_www_git -gitHubAccessToken $secureString_www_github_password }
+Run-SecureCmd -sARTUri $sARTUri -cmd $cmd -arg @{P4_Path = $P4_Path; p4_ip = $p4_ip; P4_Work_Space_Folder = $P4_Work_Space_Folder }
+if ($P4_Path.GetType().Name -eq "String") {
+    #analytics directory
+    $projectPath = Convert-P4LocationToWinLocation -P4Location $P4_Path -P4_Work_Space_Folder c:\p4
+}
 
 $logger.debug("Changing directory to path <$($projectPath)>")
-
-#debug ------------------------------------------------------------------------------------ Change this
 cd $projectPath
 
 #Install prerequisites
@@ -508,4 +508,28 @@ if($reportTable.Length -eq 0)
 $mvtReport = Join-Path -Path $projectPath -ChildPath 'mvtReport.csv'
 $logger.info("Mvt Report in path: <$($mvtReport)>")
 $reportTable | Export-Csv -Path $mvtReport -NoTypeInformation -Encoding UTF8 -Force
+
+#send email notification
+if ($ExecutionResult -ne $null -and $ExecutionResult -ne "") {
+    $ExecutionResultPath = Join-Path -Path $activeFolder -ChildPath $ExecutionResult
+    if ($Email_Subject -eq $null -or $Email_Subject -eq "") {
+        $Email_Subject = "Automated Execution Test Result for $vision"
+    }   
+    if (Test-Path -Path $ExecutionResultPath) {
+        $html = [string](generateHTMLfromCSV -media ($sInstalled_Media) -startTime $startTime -endTime (Get-Date) -resultsFile ($ExecutionResult) -clientConfig $((Get-WmiObject -Class Win32_OperatingSystem).Name) -clientName ("$env:COMPUTERNAME"))
+        try {
+            Send-MailMessage -From "MVT@aspentech.com" -To $Email_List -Subject $Email_Subject -Body $html -SmtpServer smtp.aspentech.local -BodyAsHtml -ErrorAction Stop -Attachments @($ExecutionResultPath)
+        }
+        catch {
+            Send-ErrorToMVTAdmin -vision $vision -blueprint $blueprint -task $task1 -log "Unable to send out email"
+        }
+        
+    }
+    
+    
+    
+}
+
+#project finish!
+Set-NextProject -sARTServerUri $sARTUri -vision $vision -project $projectId -completion $lsCompletion
 
