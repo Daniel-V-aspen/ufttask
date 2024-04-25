@@ -1,4 +1,22 @@
-﻿$pathLogs = "C:\p4\MvtUftLogs.txt"
+﻿$sARTUri = 'http://HQQAEBLADE710.qae.aspentech.com:3000'
+#$sARTUri = 'http://hqqaeblade710:3000'
+$sARTServerUri = $sARTUri
+$DebugPreference = "Continue"
+$DebugPreference = 'SilentlyContinue'
+while ($true) {
+    try {
+        iex ((New-Object System.Net.WebClient).DownloadString("$sARTUri/api/ps/ARTLibrary.ps1"))
+        iex ((New-Object System.Net.WebClient).DownloadString("$sARTUri/api/ps/CommonHeader.ps1"))
+        iex ((New-Object System.Net.WebClient).DownloadString("$sARTUri/api/ps/Library.ps1"))
+        break            
+    }
+    catch {
+        
+    }
+}
+
+
+$pathLogs = "C:\p4\MvtUftLogs.txt"
 class Logs 
 {
     [string]$logsPath = ""
@@ -166,10 +184,27 @@ function ReportObject($id, $description, $result)
     return $obj
 }
 
+#inputs MVT
+$P4_Path = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -project $blueprint -task $task1 -key P4_Path #The P4/GIT project you want to sync up to local VM. Example: ['https://aspentech-alm.visualstudio.com/AspenTech/_git/MES_MVT|branchName']
+$projectName = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -project $blueprint -task $task1 -key Project Name #Name of the project in Visual Studio
+$testplanPath = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -project $blueprint -task $task1 -key Test Plan path #Path to the testplan csv, the file must have the columns Id (Id in ADO), Description, Function Name (Name in project)
+#Check Screen Resolution
+$width = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "width" -LoadOnce #The width of the screen. If you don't want to set the resolution, leave it to be blank example: 1920
+$height = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "height" -LoadOnce #The height of the screen. If you don't want to set the resolution, leave it to be blank: example: 1080
+$domain = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "domain" -LoadOnce # The domain of the user account you use to login ex: machine name or corp. 
+$userName = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "userName" -LoadOnce # the username of the current box. If you don't want to set the resolution, leave it to be blank: example: administrator
+$password = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "password" -LoadOnce # the password of the current box. If you don't want to set the resolution, leave it to be blank: example: Aspen100
+$ip = Get-IPAddressV2 -MachineName $env:COMPUTERNAME
+#Email report
+$Email_List = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -project $blueprint -task $task1 -key Email_List -LoadOnce #The recepient of your MVT execution result in json format. Example: ["weiwei.wu@aspentech.com","albert.lee@aspentech.com"]
+$Email_Subject = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -project $blueprint -task $task1 -key Email_Subject -LoadOnce #The subject of your email. If you does not provide anything, the default value will be "Automated MVT Email Result
+
 #inputs Debug ------------------------------------------------------------------------------------ Change this
-$projectPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT'
-$projectName = 'Mtell Automation'
-$testplanPath = 'testplan.txt' #Id, Function name
+#$projectPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT'
+#$projectName = 'Mtell Automation'
+#$testplanPath = 'testplan.txt' #Id, Function name
+
+
 
 #Clone Repo
 #Moving into project path ------------------------------------------------------------------------------------ Change this
@@ -332,7 +367,7 @@ if($refFound -ne $references.Count)
     $reportTable += @(ReportObject -id "Number of references found" -description "Unable to find all the references, References found: <$($refFound), expected references $($references.Count)>" -result "Fail")
 }
 
-#Get list of TCS to run                      /////////////// Check this
+#Get list of TCS to run
 $tc2Run = ''
 if($reportTable.Length -eq 0)
 {
@@ -353,6 +388,34 @@ if($reportTable.Length -eq 0)
                 $tc2Run += $testcase.name + ','
             }
             $logger.debug("List of test cases in the test plan <$($tc2Run)>")
+        }
+    }
+}
+
+#set screen resolution if all variables are not empty
+$logger.info("Changing Screen resolution")
+if($width -ne $null -and $height -ne $null -and $domain -ne $null -and $userName -ne $null -and $password -ne $null -and $width -ne '' -and $height -ne '' -and $domain -ne '' -and $userName -ne '' -and $password -ne ''){
+    $iRetry=0
+    while($true)
+    {
+        $iRetry=$iRetry+1
+        if($iRetry -eq 10){
+            Read-Host -Prompt "Unable to adjust screen resolution "
+            $iRetry=0
+        }
+        Write-Progress -Activity "Set Screen Resolution to $width x $height" -Completed
+        $resolution = Get-ScreenResolution
+        if([int]($width) -ne $resolution.width -or [int]($height) -ne $resolution.height)
+        {
+            Set-ScreenResolutionViaRdp -sARTUri $sARTUri -machine $ip -domain $domain -userName $userName -password $password -width ([int]($width)) -height ([int]($height))
+            $value = 10 * $iRetry
+            Start-Sleep -Seconds $value
+            #Start-Sleep -Seconds 10*$iRetry
+        }
+        else
+        {
+            Write-Progress -Activity "Set Screen Resolution to $width x $height" -Completed
+            break
         }
     }
 }

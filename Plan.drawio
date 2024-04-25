@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-04-17T18:15:22.938Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.1.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="zc7j5E-QLK4AYnWL0vsi" version="24.1.0" type="device" pages="2">
+<mxfile host="Electron" modified="2024-04-25T18:05:13.570Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.1.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="11ET2wuvSUcETARrsQkt" version="24.1.0" type="device" pages="2">
   <diagram name="Description" id="kpyFpb0iJtDKzTZqSPPz">
-    <mxGraphModel dx="594" dy="1684" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -8,34 +8,40 @@
           <mxGeometry x="40" y="40" width="740" height="120" as="geometry" />
         </mxCell>
         <mxCell id="MZutyhSX819T72aEWWCa-2" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Clone repo&lt;/h1&gt;&lt;div&gt;First we need to be able to clone the repo&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="40" y="180" width="740" height="90" as="geometry" />
+          <mxGeometry x="40" y="180" width="740" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="MZutyhSX819T72aEWWCa-3" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Validate that the VM has all the prerequisites to run UFT&lt;/h1&gt;&lt;div&gt;Those requisites are:&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;1&amp;nbsp; UFT dlls&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;2. Unit Test Framework&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;3. Dotnet - to build the solution&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;If thea VM doesn&#39;t have any of this elements we need to send the report with the error or the poinst that are missing&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="36" y="425" width="780" height="150" as="geometry" />
+        <mxCell id="MZutyhSX819T72aEWWCa-3" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Validate that the VM has all the prerequisites to run UFT&lt;/h1&gt;&lt;div&gt;Those requisites are:&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;1&amp;nbsp; UFT dlls&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;2. Unit Test Framework&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;If thea VM doesn&#39;t have any of this elements we need to send the report with the error or the poinst that are missing&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="37" y="380" width="780" height="145" as="geometry" />
         </mxCell>
-        <mxCell id="MZutyhSX819T72aEWWCa-4" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Comple&lt;/h1&gt;&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;te the .CSPROJ&lt;/h1&gt;&lt;div&gt;Some of the dlls are located in the vm, in the path where UFT was installed, when we build the project using command line if the CSPROJ doesn&#39;t have the reference or the hint it won&#39;t build the solution. Not all the user has experience with CSPROJ so we can&#39;t ask them to fix this.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Add a function to fix the .CSPROJ in the excecution or to validate that the information is there.&amp;nbsp;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="47" y="710" width="730" height="150" as="geometry" />
+        <mxCell id="MZutyhSX819T72aEWWCa-4" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Complete the .CSPROJ&lt;/h1&gt;&lt;div&gt;Some of the dlls are located in the vm, in the path where UFT was installed, when we build the project using command line if the CSPROJ doesn&#39;t have the reference or the hint it won&#39;t build the solution. Not all the user has experience with CSPROJ so we can&#39;t ask them to fix this.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Add a function to fix the .CSPROJ in the excecution or to validate that the information is there.&amp;nbsp;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="45" y="615" width="730" height="150" as="geometry" />
         </mxCell>
         <mxCell id="MZutyhSX819T72aEWWCa-6" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Build the project&lt;/h1&gt;&lt;div&gt;Build the solution and get the dll&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Here the challenge is check if we were able to build the solution, if not send an email with the report&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="47" y="850" width="770" height="120" as="geometry" />
+          <mxGeometry x="42" y="760" width="770" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="MZutyhSX819T72aEWWCa-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Run the test case and generate the csv file&lt;/h1&gt;&lt;div&gt;Add a TestPlan file to decide the TCs that we want to run&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="47" y="990" width="770" height="130" as="geometry" />
+        <mxCell id="MZutyhSX819T72aEWWCa-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Run the test case and generate the csv file&lt;/h1&gt;&lt;div&gt;Add a TestPlan file to decide the TCs that we want to run&lt;/div&gt;&lt;div&gt;If there is any issue with any of the previoius steps avoid this step and just send an email with all the preoblems&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="45" y="1100" width="770" height="100" as="geometry" />
         </mxCell>
         <mxCell id="i_y81XxwsOdgUJL_hG4l-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Install Missing pre requisites&lt;/h1&gt;&lt;div&gt;1. Install Chocolatey&lt;/div&gt;&lt;div&gt;2. Unit Test Framework - W&lt;span style=&quot;background-color: initial;&quot;&gt;e can do this using nuget&lt;/span&gt;&lt;/div&gt;&lt;div&gt;3. Node JS - We can do this using choco&lt;/div&gt;&lt;div&gt;4. Dotnet&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="35" y="280" width="760" height="120" as="geometry" />
+          <mxGeometry x="36" y="260" width="760" height="120" as="geometry" />
         </mxCell>
         <mxCell id="7rnq9M52Hevn5cjbfYe5-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Send the report&lt;/h1&gt;&lt;div&gt;Using MVT report&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="46" y="1240" width="747" height="120" as="geometry" />
+          <mxGeometry x="45" y="1200" width="747" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="voiCNQ6PNYEdRvmfcFp5-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;UFT Services&lt;/h1&gt;&lt;div&gt;The uft service must be in the VM and they must be running&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="40" y="580" width="750" height="120" as="geometry" />
+        <mxCell id="voiCNQ6PNYEdRvmfcFp5-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;UFT Services&lt;/h1&gt;&lt;div&gt;The uft service must be in the VM and they must be running&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="41" y="525" width="750" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="vDwHp3_jsiQrzsLkWZ8--1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Change Screen Resolution&lt;/h1&gt;&lt;div&gt;Change the screen resolution of the remote vm&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="45" y="990" width="755" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="vDwHp3_jsiQrzsLkWZ8--2" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Get List of Test Cases to run&lt;/h1&gt;&lt;div&gt;Get the list of test cases from the test plan&lt;/div&gt;&lt;div&gt;If there is no test plan run all the test cases&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="45" y="880" width="755" height="120" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="lbOOUkVt4JYEEISVCX1n" name="Diagram">
-    <mxGraphModel dx="594" dy="1684" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -43,19 +49,19 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="5EkmZwmxeAxAU_YmFZFC-1" value="Start" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
-          <mxGeometry x="385" y="30" width="80" height="80" as="geometry" />
+          <mxGeometry x="385" y="120" width="80" height="80" as="geometry" />
         </mxCell>
         <mxCell id="X4EmGsIvEUJp4LUA4y1e-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="5EkmZwmxeAxAU_YmFZFC-2" target="X4EmGsIvEUJp4LUA4y1e-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="5EkmZwmxeAxAU_YmFZFC-2" value="Clone Repo" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="365" y="160" width="120" height="60" as="geometry" />
+          <mxGeometry x="365" y="230" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="NOBS6tFadOEE8-lEBTn5-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="NOBS6tFadOEE8-lEBTn5-1" target="NOBS6tFadOEE8-lEBTn5-3" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="NOBS6tFadOEE8-lEBTn5-1" value="Validate Requisites" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="365" y="420" width="120" height="60" as="geometry" />
+          <mxGeometry x="365" y="430" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="NOBS6tFadOEE8-lEBTn5-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="NOBS6tFadOEE8-lEBTn5-3" target="NOBS6tFadOEE8-lEBTn5-4" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -65,7 +71,7 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="g3BkrWP3sSCiYwX-PHHs-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="NOBS6tFadOEE8-lEBTn5-3" target="g3BkrWP3sSCiYwX-PHHs-1">
+        <mxCell id="g3BkrWP3sSCiYwX-PHHs-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="NOBS6tFadOEE8-lEBTn5-3" target="g3BkrWP3sSCiYwX-PHHs-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="NOBS6tFadOEE8-lEBTn5-3" value="All requistites?" style="rhombus;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -104,7 +110,7 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="w1hZCFJD3-Y1V1owP_M0-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="w1hZCFJD3-Y1V1owP_M0-3" target="w1hZCFJD3-Y1V1owP_M0-9" edge="1">
+        <mxCell id="ARDYrOonU0yVxU-R9MbG-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="w1hZCFJD3-Y1V1owP_M0-3" target="ARDYrOonU0yVxU-R9MbG-1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="w1hZCFJD3-Y1V1owP_M0-3" value="Problems?" style="rhombus;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -120,22 +126,22 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="w1hZCFJD3-Y1V1owP_M0-9" value="Run Test Cases" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="365" y="1230" width="120" height="60" as="geometry" />
+          <mxGeometry x="365" y="1380" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="w1hZCFJD3-Y1V1owP_M0-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="w1hZCFJD3-Y1V1owP_M0-11" target="w1hZCFJD3-Y1V1owP_M0-13" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="w1hZCFJD3-Y1V1owP_M0-11" value="Generate MVT report" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
-          <mxGeometry x="365" y="1350" width="120" height="60" as="geometry" />
+          <mxGeometry x="365" y="1480" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="w1hZCFJD3-Y1V1owP_M0-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="w1hZCFJD3-Y1V1owP_M0-13" target="w1hZCFJD3-Y1V1owP_M0-15" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="w1hZCFJD3-Y1V1owP_M0-13" value="Send Report" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="365" y="1490" width="120" height="60" as="geometry" />
+          <mxGeometry x="365" y="1590" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="w1hZCFJD3-Y1V1owP_M0-15" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" parent="1" vertex="1">
-          <mxGeometry x="410" y="1610" width="30" height="30" as="geometry" />
+          <mxGeometry x="410" y="1710" width="30" height="30" as="geometry" />
         </mxCell>
         <mxCell id="w1hZCFJD3-Y1V1owP_M0-16" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" parent="1" vertex="1">
           <mxGeometry x="770" y="1115" width="30" height="30" as="geometry" />
@@ -147,36 +153,48 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="X4EmGsIvEUJp4LUA4y1e-1" value="Install Prerequisites" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="365" y="280" width="120" height="60" as="geometry" />
+          <mxGeometry x="365" y="330" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="g3BkrWP3sSCiYwX-PHHs-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="g3BkrWP3sSCiYwX-PHHs-1" target="g3BkrWP3sSCiYwX-PHHs-4">
+        <mxCell id="g3BkrWP3sSCiYwX-PHHs-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="g3BkrWP3sSCiYwX-PHHs-1" target="g3BkrWP3sSCiYwX-PHHs-4" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="g3BkrWP3sSCiYwX-PHHs-1" value="Validate Services" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="g3BkrWP3sSCiYwX-PHHs-1" value="Validate Services" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="365" y="650" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="g3BkrWP3sSCiYwX-PHHs-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="g3BkrWP3sSCiYwX-PHHs-4" target="g3BkrWP3sSCiYwX-PHHs-6">
+        <mxCell id="g3BkrWP3sSCiYwX-PHHs-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="g3BkrWP3sSCiYwX-PHHs-4" target="g3BkrWP3sSCiYwX-PHHs-6" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="g3BkrWP3sSCiYwX-PHHs-11" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="g3BkrWP3sSCiYwX-PHHs-7">
+        <mxCell id="g3BkrWP3sSCiYwX-PHHs-11" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="g3BkrWP3sSCiYwX-PHHs-7" vertex="1" connectable="0">
           <mxGeometry x="-0.104" y="-4" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="g3BkrWP3sSCiYwX-PHHs-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="g3BkrWP3sSCiYwX-PHHs-4" target="NOBS6tFadOEE8-lEBTn5-8">
+        <mxCell id="g3BkrWP3sSCiYwX-PHHs-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="g3BkrWP3sSCiYwX-PHHs-4" target="NOBS6tFadOEE8-lEBTn5-8" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="g3BkrWP3sSCiYwX-PHHs-4" value="runnign" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="g3BkrWP3sSCiYwX-PHHs-4" value="runnign" style="rhombus;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="385" y="760" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="g3BkrWP3sSCiYwX-PHHs-9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="g3BkrWP3sSCiYwX-PHHs-6" target="g3BkrWP3sSCiYwX-PHHs-8">
+        <mxCell id="g3BkrWP3sSCiYwX-PHHs-9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="g3BkrWP3sSCiYwX-PHHs-6" target="g3BkrWP3sSCiYwX-PHHs-8" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="g3BkrWP3sSCiYwX-PHHs-6" value="Send Email with the problems" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="g3BkrWP3sSCiYwX-PHHs-6" value="Send Email with the problems" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="590" y="770" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="g3BkrWP3sSCiYwX-PHHs-8" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" vertex="1" parent="1">
+        <mxCell id="g3BkrWP3sSCiYwX-PHHs-8" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" parent="1" vertex="1">
           <mxGeometry x="750" y="785" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ARDYrOonU0yVxU-R9MbG-6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="ARDYrOonU0yVxU-R9MbG-1" target="ARDYrOonU0yVxU-R9MbG-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ARDYrOonU0yVxU-R9MbG-1" value="Get Test Plan" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="1200" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ARDYrOonU0yVxU-R9MbG-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="ARDYrOonU0yVxU-R9MbG-5" target="w1hZCFJD3-Y1V1owP_M0-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ARDYrOonU0yVxU-R9MbG-5" value="Change Screen Resolution" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="1290" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
