@@ -345,15 +345,16 @@ if($reportTable.Length -eq 0)
     if(-not(Test-Path -Path $testplanFullPath))
     {
         $logger.error("Test plan file not found")
-        break
+        
+    } else {
+        $tpInfo = @{}
+        foreach($testcase in $testPlanInfo)
+        {
+            $tpInfo[$testcase.name] = $testcase.id
+            $tc2Run += $testcase.name + ','
+        }
+        $logger.debug("List of test cases in the test plan <$($tc2Run)>")
     }
-    $tpInfo = @{}
-    foreach($testcase in $testPlanInfo)
-    {
-        $tpInfo[$testcase.name] = $testcase.id
-        $tc2Run += $testcase.name + ','
-    }
-    $logger.debug("List of test cases in the test plan <$($tc2Run)>")
 }
 
 #Build Solution
@@ -364,6 +365,7 @@ if($reportTable.Length -eq 0)
 
     #Looking for the dll
     $logger.info("Looking for the dll")
+    Start-Sleep -Seconds 5
     $buildInfo = Get-Content $buildFile
     $dllPath = $false
     for($i = 0; $i -lt $buildInfo.Count; $i++)
@@ -380,12 +382,13 @@ if($reportTable.Length -eq 0)
     if (-not($dllPath))
     { 
         $logger.error("Dll not found")
-    }
-    $logger.info("dll in path <$($dllPath)>")
-    if (-not(Test-Path -Path $dllPath))
-    {
-        $logger.error("Dll path not found, path: <$($dllPath)>")
-        $reportTable += @(ReportObject -id "Dll not found" -description "Unable to find dll path, build information in <$($projectPath)\$buildFile>" -result "Fail")
+    } else {
+        $logger.info("dll in path <$($dllPath)>")
+        if (-not(Test-Path -Path $dllPath))
+        {
+            $logger.error("Dll path not found, path: <$($dllPath)>")
+            $reportTable += @(ReportObject -id "Dll not found" -description "Unable to find dll path, build information in <$($projectPath)\$buildFile>" -result "Fail")
+        }
     }
 }
 
@@ -405,7 +408,7 @@ if($reportTable.Length -eq 0)
 
 if($reportTable.Length -eq 0)
 {
-    $mvtReport = Join-Path -Path $projectPath -ChildPath 'mvtReport.csv'
+    
     #Get results
     $logger.info("Looking for the results file")
     $reportFilePath = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *.trx | Sort-Object -Property LastWriteTime -Descending
@@ -435,11 +438,12 @@ if($reportTable.Length -eq 0)
         else {
             $result = "Fail"
         }
-
+        $logger.debug("TC: <$($result.UnitTestResult.testName)> Result: <$($result.UnitTestResult.outcome)>")
         $reportTable += @(ReportObject -id $id -description $description -result $result)
     }
-
-    $logger.info("Mvt Report in path: <$($mvtReport)>")
-    $reportTable | Export-Csv -Path $mvtReport -NoTypeInformation -Encoding UTF8 -Force
+    
 }
+$mvtReport = Join-Path -Path $projectPath -ChildPath 'mvtReport.csv'
+$logger.info("Mvt Report in path: <$($mvtReport)>")
+$reportTable | Export-Csv -Path $mvtReport -NoTypeInformation -Encoding UTF8 -Force
 
