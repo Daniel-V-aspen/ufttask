@@ -170,6 +170,14 @@ $pathLeanft = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\leanft.bat'
 $pathLeanStart = '.\.uftServiceStart.txt'
 $pathLeanStatus = '.\.uftServiceStatus.txt'
 
+#Packages Information
+$packagesPath = '.\packagesMvt'
+$frames = @{
+    "Microsoft.VisualStudio.TestPlatform.TestFramework" = '';
+    "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions" = '';
+    "Microsoft.VisualStudio.QualityTools.UnitTestFramework" = 'VS.QualityTools.UnitTestFramework';
+}
+
 #Build Solution
 $buildFile = '.\.buildInformation.txt'
 
@@ -235,9 +243,6 @@ $logger.info('Installing Node')
 
 $logger.debug("Installing Unit Test Package")
 NuGet Install VS.QualityTools.UnitTestFramework
-
-$logger.info('Installing Node')
-&choco install nodejs --version=16.19.0 -f -y
 
 $logger.debug("dotnet")
 try

@@ -165,6 +165,9 @@ $logger.start()
 $dirUft = ('C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet',
     'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\')
 
+#packages
+$packagesPath = '.\packagesMvt'
+
 #UFT Service variables
 $pathLeanft = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\leanft.bat'
 $pathLeanStart = '.\.uftServiceStart.txt'
@@ -234,9 +237,12 @@ $logger.info('Installing Node')
 &choco install nodejs --version=16.19.0 -f -y
 
 $logger.debug("Installing Unit Test Package")
+mkdir $packagesPath
+cd $packagesPath
 NuGet Install VS.QualityTools.UnitTestFramework
 $pathLstUtest = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *QualityTools.UnitTestFramework.dll | Where-Object Mode -Match 'a' | Sort-Object -Property LastWriteTime -Descending
 $pathUTest = $pathLstUtest[0].FullName
+cd ..
 
 $logger.debug("dotnet")
 try
