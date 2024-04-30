@@ -1,4 +1,22 @@
-﻿$pathLogs = "C:\p4\MvtUftLogs.txt"
+﻿$sARTUri = 'http://HQQAEBLADE710.qae.aspentech.com:3000'
+#$sARTUri = 'http://hqqaeblade710:3000'
+$sARTServerUri = $sARTUri
+$DebugPreference = "Continue"
+$DebugPreference = 'SilentlyContinue'
+#while ($true) {
+#    try {
+#        iex ((New-Object System.Net.WebClient).DownloadString("$sARTUri/api/ps/ARTLibrary.ps1"))
+#        iex ((New-Object System.Net.WebClient).DownloadString("$sARTUri/api/ps/CommonHeader.ps1"))
+#        iex ((New-Object System.Net.WebClient).DownloadString("$sARTUri/api/ps/Library.ps1"))
+#        break            
+#    }
+#    catch {
+#        
+#    }
+#}
+
+
+$pathLogs = "C:\Users\administrator\Desktop\DanielTest\MvtUftLogs.txt"
 class Logs 
 {
     [string]$logsPath = ""
@@ -166,18 +184,35 @@ function ReportObject($id, $description, $result)
     return $obj
 }
 
+#inputs MVT
+#$P4_Path = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -project $blueprint -task $task1 -key P4_Path #The P4/GIT project you want to sync up to local VM. Example: ['https://aspentech-alm.visualstudio.com/AspenTech/_git/MES_MVT|branchName']
+#$projectName = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -project $blueprint -task $task1 -key Project Name #Name of the project in Visual Studio
+#$testplanPath = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -project $blueprint -task $task1 -key Test Plan path #Path to the testplan csv, the file must have the columns Id (Id in ADO), Description, Function Name (Name in project)
+#Check Screen Resolution
+#$width = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "width" -LoadOnce #The width of the screen. If you don't want to set the resolution, leave it to be blank example: 1920
+#$height = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "height" -LoadOnce #The height of the screen. If you don't want to set the resolution, leave it to be blank: example: 1080
+#$domain = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "domain" -LoadOnce # The domain of the user account you use to login ex: machine name or corp. 
+#$userName = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "userName" -LoadOnce # the username of the current box. If you don't want to set the resolution, leave it to be blank: example: administrator
+#$password = Load-Setting -sARTServerUri $sARTUri -vision $vision -project $blueprint -task $task1 -key "password" -LoadOnce # the password of the current box. If you don't want to set the resolution, leave it to be blank: example: Aspen100
+#$ip = Get-IPAddressV2 -MachineName $env:COMPUTERNAME
+#Email report
+#$Email_List = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -project $blueprint -task $task1 -key Email_List -LoadOnce #The recepient of your MVT execution result in json format. Example: ["weiwei.wu@aspentech.com","albert.lee@aspentech.com"]
+#$Email_Subject = Load-Setting -sARTServerUri $sARTServerUri -vision $vision -project $blueprint -task $task1 -key Email_Subject -LoadOnce #The subject of your email. If you does not provide anything, the default value will be "Automated MVT Email Result
+
 #inputs Debug ------------------------------------------------------------------------------------ Change this
-$projectPath = 'C:\Users\administrator\Desktop\Git\MtellCore-UFT'
-$projectName = 'Mtell Automation'
+$projectPath = 'C:\Users\administrator\Desktop\DanielTest\AspenHYSYS'
+$projectName = 'AspenHYSYS'
 $testplanPath = 'testplan.txt' #Id, Function name
 
 #Clone Repo
-#Moving into project path ------------------------------------------------------------------------------------ Change this
-
+#$cmd = { Sync-FromP4 -P4_User wuwei -P4_Server hqperforce2.corp.aspentech.com:1666 -P4_Location_List @($P4_Path) -P4_PASSWORD $secureString_wwwPass -P4_Work_Space_Folder c:\p4 -P4_Work_Space_Name ART -gitAccessToken $secureString_www_git -gitHubAccessToken $secureString_www_github_password }
+#Run-SecureCmd -sARTUri $sARTUri -cmd $cmd -arg @{P4_Path = $P4_Path; p4_ip = $p4_ip; P4_Work_Space_Folder = $P4_Work_Space_Folder }
+#if ($P4_Path.GetType().Name -eq "String") {
+#    #analytics directory
+#    $projectPath = Convert-P4LocationToWinLocation -P4Location $P4_Path -P4_Work_Space_Folder c:\p4
+#}
 
 $logger.debug("Changing directory to path <$($projectPath)>")
-
-#debug ------------------------------------------------------------------------------------ Change this
 cd $projectPath
 
 #Install prerequisites
@@ -200,8 +235,9 @@ $logger.info('Installing Node')
 
 $logger.debug("Installing Unit Test Package")
 NuGet Install VS.QualityTools.UnitTestFramework
-$pathLstUtest = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *QualityTools.UnitTestFramework.dll | Where-Object Mode -Match 'a' | Sort-Object -Property LastWriteTime -Descending
-$pathUTest = $pathLstUtest[0].FullName
+
+$logger.info('Installing Node')
+&choco install nodejs --version=16.19.0 -f -y
 
 $logger.debug("dotnet")
 try
@@ -215,6 +251,8 @@ catch
 }
 
 #Validate Prerequisites
+$pathLstUtest = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *QualityTools.UnitTestFramework.dll | Where-Object Mode -Match 'a' | Sort-Object -Property LastWriteTime -Descending
+$pathUTest = $pathLstUtest[0].FullName
 for($i=0; $i -lt $dirUft.Count; $i++)
 {
     if(-not(Test-Path -Path $dirUft[$i]))
@@ -332,7 +370,7 @@ if($refFound -ne $references.Count)
     $reportTable += @(ReportObject -id "Number of references found" -description "Unable to find all the references, References found: <$($refFound), expected references $($references.Count)>" -result "Fail")
 }
 
-#Get list of TCS to run                      /////////////// Check this
+#Get list of TCS to run
 $tc2Run = ''
 if($reportTable.Length -eq 0)
 {
@@ -357,6 +395,34 @@ if($reportTable.Length -eq 0)
     }
 }
 
+#set screen resolution if all variables are not empty
+$logger.info("Changing Screen resolution")
+if($width -ne $null -and $height -ne $null -and $domain -ne $null -and $userName -ne $null -and $password -ne $null -and $width -ne '' -and $height -ne '' -and $domain -ne '' -and $userName -ne '' -and $password -ne ''){
+    $iRetry=0
+    while($true)
+    {
+        $iRetry=$iRetry+1
+        if($iRetry -eq 10){
+            Read-Host -Prompt "Unable to adjust screen resolution "
+            $iRetry=0
+        }
+        Write-Progress -Activity "Set Screen Resolution to $width x $height" -Completed
+        $resolution = Get-ScreenResolution
+        if([int]($width) -ne $resolution.width -or [int]($height) -ne $resolution.height)
+        {
+            Set-ScreenResolutionViaRdp -sARTUri $sARTUri -machine $ip -domain $domain -userName $userName -password $password -width ([int]($width)) -height ([int]($height))
+            $value = 10 * $iRetry
+            Start-Sleep -Seconds $value
+            #Start-Sleep -Seconds 10*$iRetry
+        }
+        else
+        {
+            Write-Progress -Activity "Set Screen Resolution to $width x $height" -Completed
+            break
+        }
+    }
+}
+
 #Build Solution
 if($reportTable.Length -eq 0)
 {
@@ -374,7 +440,7 @@ if($reportTable.Length -eq 0)
         {
             $logger.info("Dll found")
             Write-Host $buildInfo[$i]
-            $elements = $buildInfo[$i].Split('>')
+            $elements = $buildInfo[3].Split('>')
             $dllPath = $elements[$elements.Count - 1].Substring(1)
             break
         }
@@ -445,4 +511,25 @@ if($reportTable.Length -eq 0)
 $mvtReport = Join-Path -Path $projectPath -ChildPath 'mvtReport.csv'
 $logger.info("Mvt Report in path: <$($mvtReport)>")
 $reportTable | Export-Csv -Path $mvtReport -NoTypeInformation -Encoding UTF8 -Force
+
+#send email notification
+#if ($ExecutionResult -ne $null -and $ExecutionResult -ne "") {
+#    $ExecutionResultPath = Join-Path -Path $activeFolder -ChildPath $ExecutionResult
+#    if ($Email_Subject -eq $null -or $Email_Subject -eq "") {
+#        $Email_Subject = "Automated Execution Test Result for $vision"
+#    }   
+#    if (Test-Path -Path $ExecutionResultPath) {
+#        $html = [string](generateHTMLfromCSV -media ($sInstalled_Media) -startTime $startTime -endTime (Get-Date) -resultsFile ($ExecutionResult) -clientConfig $((Get-WmiObject -Class Win32_OperatingSystem).Name) -clientName ("$env:COMPUTERNAME"))
+#        try {
+#            Send-MailMessage -From "MVT@aspentech.com" -To $Email_List -Subject $Email_Subject -Body $html -SmtpServer smtp.aspentech.local -BodyAsHtml -ErrorAction Stop -Attachments @($ExecutionResultPath)
+#        }
+#        catch {
+#            Send-ErrorToMVTAdmin -vision $vision -blueprint $blueprint -task $task1 -log "Unable to send out email"
+#        }
+#        
+#    }   
+#}
+
+#project finish!
+#Set-NextProject -sARTServerUri $sARTUri -vision $vision -project $projectId -completion $lsCompletion
 
