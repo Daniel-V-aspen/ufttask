@@ -374,7 +374,7 @@ if($reportTable.Length -eq 0)
         {
             $logger.info("Dll found")
             Write-Host $buildInfo[$i]
-            $elements = $buildInfo[3].Split('>')
+            $elements = $buildInfo[$i].Split('>')
             $dllPath = $elements[$elements.Count - 1].Substring(1)
             break
         }
