@@ -165,21 +165,24 @@ $logger.start()
 $dirUft = ('C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet',
     'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\')
 
+#MVTfolder 
+$mvtPath = '.\.mvt\'
+
 #UFT Service variables
 $pathLeanft = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\leanft.bat'
-$pathLeanStart = '.\.uftServiceStart.txt'
-$pathLeanStatus = '.\.uftServiceStatus.txt'
+$pathLeanStart = Join-Path -Path $mvtPath -ChildPath '.\.uftServiceStart.txt'
+$pathLeanStatus = Join-Path -Path $mvtPath -ChildPath '.\.uftServiceStatus.txt'
 
 #Packages Information
 $packagesPath = '.\packagesMvt'
 $frames = @{
-    "Microsoft.VisualStudio.TestPlatform.TestFramework" = '';
-    "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions" = '';
+    "Microsoft.VisualStudio.TestPlatform.TestFramework" = 'MSTest.TestFramework';
+    "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions" = 'MSTest.TestFramework';
     "Microsoft.VisualStudio.QualityTools.UnitTestFramework" = 'VS.QualityTools.UnitTestFramework';
 }
 
 #Build Solution
-$buildFile = '.\.buildInformation.txt'
+$buildFile = Join-Path -Path $mvtPath -ChildPath '.\.buildInformation.txt'
 
 #Information needed for the report
 $reportTable = @()
@@ -220,8 +223,38 @@ $testplanPath = 'testplan.txt' #Id, Function name
 #    $projectPath = Convert-P4LocationToWinLocation -P4Location $P4_Path -P4_Work_Space_Folder c:\p4
 #}
 
+function Build-Project
+{
+    #Build Solution
+    if($reportTable.Length -eq 0)
+    {
+        $logger.info("Build information in: <$(Join-Path -Path $projectPath -ChildPath $buildFile)>")
+        dotnet build > $buildFile 
+
+        #Looking for the dll
+        $logger.info("Looking for the dll")
+        Start-Sleep -Seconds 5
+        $buildInfo = Get-Content $buildFile
+        $dllPath = $false
+        for($i = 0; $i -lt $buildInfo.Count; $i++)
+        {
+            if($buildInfo[$i] -match $projectName)
+            {
+                $logger.info("Dll found")
+                Write-Host $buildInfo[$i]
+                $elements = $buildInfo[$i].Split('>')
+                $dllPath = $elements[$elements.Count - 1].Substring(1)
+                return $dllPath
+            }
+        }
+        $logger.error('Error Building the project')
+        return $false
+    }
+}
+
 $logger.debug("Changing directory to path <$($projectPath)>")
 cd $projectPath
+mkdir $mvtPath
 
 #Install Choco
 $logger.info("Installing prerequisites")
@@ -238,3 +271,108 @@ catch
 
 $logger.info('Installing Node')
 &choco install nodejs --version=16.19.0 -f -y
+
+$logger.debug("dotnet")
+try
+{
+    dotnet --version
+}
+catch
+{
+    $logger.info("Installing dotnet")
+    choco install dotnet --pre 
+}
+
+#Build Solution
+$dllPath = Build-Project
+
+if(-not $dllPath)
+{
+    $logger.error('Problems building the solution')
+
+    #Get Framework
+    $logger.info("Looking for the .csproj file")
+    $pathLstCsproj = Get-ChildItem -Path .\ -Recurse -Filter *.csproj
+    $pathCsproj = $pathLstCsproj[0].FullName
+    $logger.debug("CSPROJ found, path: <$($pathCsproj)>")
+    [xml]$csprojInfo = Get-Content $pathCsproj
+
+    $findFramework = $false
+    $frameworks2Install = [System.Collections.ArrayList]@()
+    $logger.info('Looking for the framework')
+    for($i = 0; $i -lt $csprojInfo.Project.ItemGroup.Count; $i++)
+    {
+        if($csprojInfo.Project.ItemGroup[$i].Reference.Count -gt 0)
+        {
+            $findFramework = $true
+            for($ref = 0; $ref -lt $csprojInfo.Project.ItemGroup[$i].Reference.Count; $ref++)
+            {
+                $refKey = $csprojInfo.Project.ItemGroup[$i].Reference[$ref].Include.split(',')[0]
+                if($frames[$refKey] -ne $null)
+                {
+                    $logger.debug("Framework: $($refKey) found")
+                    $logger.debug("Adding Framework into the list: $($frames[$refKey])")
+                    [void]$frameworks2Install.Add($frames[$refKey])
+                }
+            }
+        }
+    }
+    $frameworks2Install = $frameworks2Install | Sort-Object -Unique
+
+    $logger.info("Installing Nuget")
+    choco install nuget.commandline -f -y
+
+    $logger.debug("Installing Unit Test Package")
+    mkdir $packagesPath
+    cd $packagesPath
+
+    foreach($package in $frameworks2Install)
+    {
+        NuGet Install VS.QualityTools.UnitTestFramework
+    }
+    NuGet Install VS.QualityTools.UnitTestFramework
+    $pathLstUtest = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *QualityTools.UnitTestFramework.dll | Where-Object Mode -Match 'a' | Sort-Object -Property LastWriteTime -Descending
+    $pathUTest = $pathLstUtest[0].FullName
+    cd ..
+
+
+}
+
+
+if($dllPath)
+{
+    #Start Services
+    $logger.info("Start Leanft Services")
+    $leanRunning = $false
+    for($i = 0; $i -lt 4; $i++)
+    {
+        & $pathLeanft start  > $pathLeanStart
+        Start-Sleep -Seconds 2
+        $startInfo = Get-Content $pathLeanStart
+        if($startInfo -match 'already up')
+        {
+            $logger.info("Leanft Service is running")
+            $leanRunning = $true
+            break
+        }
+        Start-Sleep -Seconds 2
+        & $pathLeanft info  > $pathLeanStatus
+        $startInfo = Get-Content $pathLeanStart
+        if($statusInfo -match 'currently running')
+        {
+            $logger.info("Leanft Service is running")
+            $leanRunning = $true
+            break
+        }
+        $logger.debug("Try to run Leanft Service: $($i+1)")
+    }
+
+    if(-not($leanRunning))
+    {
+        $reportTable += @(ReportObject -id "Leanft Service" -description "Unable to run the service" -result "Fail")
+    }
+}
+
+
+
+
