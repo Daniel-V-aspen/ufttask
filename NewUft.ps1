@@ -181,6 +181,23 @@ $frames = @{
     "Microsoft.VisualStudio.QualityTools.UnitTestFramework" = 'VS.QualityTools.UnitTestFramework';
 }
 
+$framesDll = @{
+    "Microsoft.VisualStudio.TestPlatform.TestFramework" = '*TestFramework.Extensions.dll';
+    "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions" = '*TestFramework.dll';
+    "Microsoft.VisualStudio.QualityTools.UnitTestFramework" = '*QualityTools.UnitTestFramework.dll';
+}
+
+#references
+$references = @{
+    'HP.LFT.SDK' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.SDK.dll';
+    'HP.LFT.UnitTesting' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.UnitTesting.dll';
+    'HP.LFT.Common' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.Common.dll';
+    'HP.LFT.Communication.SocketClient' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\HP.LFT.Communication.SocketClient.dll';
+    'HP.LFT.Report' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.Report.dll';
+    'HP.LFT.Verifications' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\SDK\DotNet\HP.LFT.Verifications.dll'
+    'WebSocket4Net' = 'C:\Program Files (x86)\Micro Focus\UFT Developer\bin\WebSocket4Net.dll'
+    }
+
 #Build Solution
 $buildFile = Join-Path -Path $mvtPath -ChildPath '.\.buildInformation.txt'
 
@@ -226,30 +243,29 @@ $testplanPath = 'testplan.txt' #Id, Function name
 function Build-Project
 {
     #Build Solution
-    if($reportTable.Length -eq 0)
-    {
-        $logger.info("Build information in: <$(Join-Path -Path $projectPath -ChildPath $buildFile)>")
-        dotnet build > $buildFile 
 
-        #Looking for the dll
-        $logger.info("Looking for the dll")
-        Start-Sleep -Seconds 5
-        $buildInfo = Get-Content $buildFile
-        $dllPath = $false
-        for($i = 0; $i -lt $buildInfo.Count; $i++)
+    $logger.info("Build information in: <$(Join-Path -Path $projectPath -ChildPath $buildFile)>")
+    dotnet build > $buildFile 
+
+    #Looking for the dll
+    $logger.info("Looking for the dll")
+    Start-Sleep -Seconds 5
+    $buildInfo = Get-Content $buildFile
+    $dllPath = $false
+    for($i = 0; $i -lt $buildInfo.Count; $i++)
+    {
+        if($buildInfo[$i] -match $projectName)
         {
-            if($buildInfo[$i] -match $projectName)
-            {
-                $logger.info("Dll found")
-                Write-Host $buildInfo[$i]
-                $elements = $buildInfo[$i].Split('>')
-                $dllPath = $elements[$elements.Count - 1].Substring(1)
-                return $dllPath
-            }
+            $logger.info("Dll found")
+            Write-Host $buildInfo[$i]
+            $elements = $buildInfo[$i].Split('>')
+            $dllPath = $elements[$elements.Count - 1].Substring(1)
+            return $dllPath
         }
-        $logger.error('Error Building the project')
-        return $false
     }
+    $logger.error('Error Building the project')
+    return $false
+
 }
 
 $logger.debug("Changing directory to path <$($projectPath)>")
@@ -283,6 +299,17 @@ catch
     choco install dotnet --pre 
 }
 
+$logger.debug("installing vstest.console.exe")
+try
+{
+    vstest.console.exe --version
+}
+catch
+{
+    $logger.info("Installing vstest")
+    choco install visualstudio2022testagent -f -y
+}
+
 #Build Solution
 $dllPath = Build-Project
 
@@ -299,6 +326,7 @@ if(-not $dllPath)
 
     $findFramework = $false
     $frameworks2Install = [System.Collections.ArrayList]@()
+    $frameworksList = [System.Collections.ArrayList]@()
     $logger.info('Looking for the framework')
     for($i = 0; $i -lt $csprojInfo.Project.ItemGroup.Count; $i++)
     {
@@ -313,6 +341,7 @@ if(-not $dllPath)
                     $logger.debug("Framework: $($refKey) found")
                     $logger.debug("Adding Framework into the list: $($frames[$refKey])")
                     [void]$frameworks2Install.Add($frames[$refKey])
+                    [void]$frameworksList.Add($refKey)
                 }
             }
         }
@@ -325,21 +354,80 @@ if(-not $dllPath)
     $logger.debug("Installing Unit Test Package")
     mkdir $packagesPath
     cd $packagesPath
-
     foreach($package in $frameworks2Install)
     {
-        NuGet Install VS.QualityTools.UnitTestFramework
+        NuGet Install $package
     }
-    NuGet Install VS.QualityTools.UnitTestFramework
-    $pathLstUtest = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter *QualityTools.UnitTestFramework.dll | Where-Object Mode -Match 'a' | Sort-Object -Property LastWriteTime -Descending
-    $pathUTest = $pathLstUtest[0].FullName
+    foreach($package in $frameworksList)
+    {
+        $refPath = Get-ChildItem -Path '.\' -Recurse -ErrorAction SilentlyContinue -Filter $framesDll[$package] | Where-Object Mode -Match 'a' | Sort-Object -Property LastWriteTime -Descending
+        $references[$package] = $refPath[0].FullName
+    }
     cd ..
 
+    #Validate Prerequisites
+    $logger.info('Vlidating UFT')
+    for($i=0; $i -lt $dirUft.Count; $i++)
+    {
+        if(-not(Test-Path -Path $dirUft[$i]))
+        {
+            $des = "Dlls UFT pre requisites not found: <$($dirUft[$i])>"
+            $logger.error($des)
+            $id = "Rerequisite$($i)"
+            $reportTable += @(ReportObject -id $id -description $des -result "Fail")
+        }
+    }
+    if($reportTable.Length -eq 0)
+    {
+        #Complete CSPROJ
+        $logger.info("Starting process to replace the references")
+        $findRequirements = $false
+        $refFound = 0
+        $childHint = $csprojInfo.CreateElement('HintPath')
+        for($i = 0; $i -lt $csprojInfo.Project.ItemGroup.Count; $i++)
+        {
+            if($csprojInfo.Project.ItemGroup[$i].Reference.Count -gt 0)
+            {
+                $findRequirements = $true
+                for($ref = 0; $ref -lt $csprojInfo.Project.ItemGroup[$i].Reference.Count; $ref++)
+                {
+                    if($references[$csprojInfo.Project.ItemGroup[$i].Reference[$ref].Include.split(',')[0]] -ne $null)
+                    {
+                        $refKey = $csprojInfo.Project.ItemGroup[$i].Reference[$ref].Include.split(',')[0]
+                        $logger.debug("Reference: $($refKey) found")
+                        $refFound++
+                        $logger.debug("Adding HintPath: $($references[$refKey])")
+                        $childHint = $csprojInfo.CreateElement('HintPath') 
+                        if(-not($csprojInfo.Project.ItemGroup[$i].Reference[$ref].HintPath))
+                        {
+                            [void]$csprojInfo.Project.ItemGroup[$i].Reference[$ref].AppendChild($childHint)
+                        }
+                        $csprojInfo.Project.ItemGroup[$i].Reference[$ref].HintPath = $references[$refKey].ToString()
+                    }
+                }
+            }
+        }
+        $logger.info("Saving changes in the .csparoj <$($pathCsproj)>")
+        $csprojInfo.Save($pathCsproj)
 
+        #Build Solution
+        $dllPath = Build-Project
+
+        if (-not($dllPath))
+        {
+            $logger.info("dll in path <$($dllPath)>")
+            if (-not(Test-Path -Path $dllPath))
+            {
+                $logger.error("Dll path not found, path: <$($dllPath)>")
+                $reportTable += @(ReportObject -id "Dll not found" -description "Unable to find dll path, build information in <$($projectPath)\$buildFile>" -result "Fail")
+            }
+        }
+    }
 }
 
 
-if($dllPath)
+
+if($reportTable.Length -eq 0)
 {
     #Start Services
     $logger.info("Start Leanft Services")
@@ -374,5 +462,75 @@ if($dllPath)
 }
 
 
+#Get list of TCS to run
+$tc2Run = ''
+if($reportTable.Length -eq 0)
+{
+    if($testplanPath -eq "" -or $testplanPath -eq $null)
+    {
+        $logger.error("Test plan file not found")
+    } else {
+        $testplanFullPath = Join-Path -Path $projectPath -ChildPath $testplanPath
+        if(-not(Test-Path -Path $testplanFullPath))
+        {
+            $logger.error("Test plan file not found")
+        
+        } else {
+            $tpInfo = @{}
+            foreach($testcase in $testPlanInfo)
+            {
+                $tpInfo[$testcase.name] = $testcase.id
+                $tc2Run += $testcase.name + ','
+            }
+            $logger.debug("List of test cases in the test plan <$($tc2Run)>")
+        }
+    }
+}
 
+#set screen resolution if all variables are not empty
+if($reportTable.Length -eq 0)
+{
+    $logger.info("Changing Screen resolution")
+    if($width -ne $null -and $height -ne $null -and $domain -ne $null -and $userName -ne $null -and $password -ne $null -and $width -ne '' -and $height -ne '' -and $domain -ne '' -and $userName -ne '' -and $password -ne ''){
+        $iRetry=0
+        while($true)
+        {
+            $iRetry=$iRetry+1
+            if($iRetry -eq 10){
+                Read-Host -Prompt "Unable to adjust screen resolution "
+                $iRetry=0
+            }
+            Write-Progress -Activity "Set Screen Resolution to $width x $height" -Completed
+            $resolution = Get-ScreenResolution
+            if([int]($width) -ne $resolution.width -or [int]($height) -ne $resolution.height)
+            {
+                Set-ScreenResolutionViaRdp -sARTUri $sARTUri -machine $ip -domain $domain -userName $userName -password $password -width ([int]($width)) -height ([int]($height))
+                $value = 10 * $iRetry
+                Start-Sleep -Seconds $value
+                #Start-Sleep -Seconds 10*$iRetry
+            }
+            else
+            {
+                Write-Progress -Activity "Set Screen Resolution to $width x $height" -Completed
+                break
+            }
+        }
+    }
+}
+
+if($reportTable.Length -eq 0)
+{
+    # Execute the automation
+    $logger.info('Excecuting UFT')
+    if($tc2Run -eq '' -or $tc2Run -eq $null)
+    {
+        vstest.console.exe $dllPath /Logger:trx
+    }
+    else
+    {
+        vstest.console.exe $dllPath /Tests:$tc2Run /Logger:trx
+        #vstest.console.exe $dllPath /Tests:vstsedr2 /Logger:trx
+        
+    }
+}
 
